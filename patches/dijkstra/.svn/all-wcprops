@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/seec-bench/!svn/ver/2/bench_hank/dijkstra2
+END
+dijkstra32threads.sh
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/dijkstra32threads.sh
+END
+dijkstra-pt-hb-dvfs.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/seec-bench/!svn/ver/2/bench_hank/dijkstra2/dijkstra-pt-hb-dvfs.c
+END
+dijkstra-pt-hb.d
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/dijkstra-pt-hb.d
+END
+power.txt
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/power.txt
+END
+barrier.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/barrier.h
+END
+dijkstra-pt-b.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/dijkstra-pt-b.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/seec-bench/!svn/ver/2/bench_hank/dijkstra2/Makefile
+END
+dijkstra-pt-b.d
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/seec-bench/!svn/ver/2/bench_hank/dijkstra2/dijkstra-pt-b.d
+END
+heartbeat.log
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/heartbeat.log
+END
+dijkstra-pt-hb
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/dijkstra-pt-hb
+END
+weights3.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/seec-bench/!svn/ver/1/bench_hank/dijkstra2/weights3.h
+END

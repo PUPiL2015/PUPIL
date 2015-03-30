@@ -1,0 +1,2 @@
+search-batch: swish-batch.c
+	gcc -g -O3 -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ swish-batch.c -o swish-batch -lhb-acc-pow-shared -lm -lrt -fopenmp

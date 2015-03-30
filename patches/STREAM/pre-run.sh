@@ -1,0 +1,8 @@
+NUMBER=30000
+BINARY=/local/huazhe/development/STREAM/stream_c.exe
+WINDOW=500
+ARGS=""
+PREFIX="STREAM"
+
+#export OMP_NUM_THREADS=8
+export ${PREFIX}_WINDOW_SIZE=$WINDOW
