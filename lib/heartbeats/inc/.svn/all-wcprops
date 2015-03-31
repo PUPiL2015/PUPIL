@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 26
+/svn/!svn/ver/21/trunk/inc
+END
+heartbeat.h
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/27/trunk/inc/heartbeat.h
+END
+heart_rate_monitor.h
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/21/trunk/inc/heart_rate_monitor.h
+END

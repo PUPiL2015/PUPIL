@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 26
+/svn/!svn/ver/21/trunk/src
+END
+lat.c
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/!svn/ver/26/trunk/src/lat.c
+END
+tp.c
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/26/trunk/src/tp.c
+END
+heartbeat-shared.c
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/28/trunk/src/heartbeat-shared.c
+END
+application.c
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/26/trunk/src/application.c
+END
+system.c
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/26/trunk/src/system.c
+END
+mainpage.h
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/21/trunk/src/mainpage.h
+END
+core-allocator.c
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/27/trunk/src/core-allocator.c
+END
+heart_rate_monitor-shared.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/21/trunk/src/heart_rate_monitor-shared.c
+END

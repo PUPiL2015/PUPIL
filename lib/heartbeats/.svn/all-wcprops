@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 22
+/svn/!svn/ver/24/trunk
+END
+TODO
+K 25
+svn:wc:ra_dav:version-url
+V 27
+/svn/!svn/ver/26/trunk/TODO
+END
+heartbeats_doc
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/21/trunk/heartbeats_doc
+END
+NEWS
+K 25
+svn:wc:ra_dav:version-url
+V 27
+/svn/!svn/ver/24/trunk/NEWS
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 29
+/svn/!svn/ver/26/trunk/README
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/27/trunk/Makefile
+END
