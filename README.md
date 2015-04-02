@@ -7,8 +7,8 @@ cap during application runtime.
 
 Running PUPiL Examples
 ----------------------------------------
-First ensure that you have installed the Heartbeats library.
-Check out the README file under the Heartbeats sub-directory for install instructions. 
+First ensure that you have installed the Heartbeats library.  
+Check out the README file under the Heartbeats sub-directory for install instructions.   
 For all the benckmarks, we have inserted Heartbeats segment code and libraries. It should
 build successfully by runnning each Makefile under the benchmark directory.
 
