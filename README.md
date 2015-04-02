@@ -9,7 +9,8 @@ Running PUPiL Examples
 ----------------------------------------
 First ensure that you have installed the Heartbeats library.
 Check out the README file under the Heartbeats sub-directory for install instructions. 
-For all the benckmarks, we have inserted Heartbeats segment code and libraries. It should build successfully by runnning each Makefile under the benchmark directory.
+For all the benckmarks, we have inserted Heartbeats segment code and libraries. It should
+build successfully by runnning each Makefile under the benchmark directory.
 
 IMPORTANT NOTE: The heartbeat inserted program will not run until the environment variable
 HEARTBEAT_ENABLED_DIR is set, which is required by the Heartbeats library.
