@@ -8,49 +8,23 @@ cap during application runtime.
 Running PUPiL Examples
 ----------------------------------------
 First ensure that you have installed the Heartbeats library.
+Check out the README file under the Heartbeats sub-directory for install instructions. 
+For all the benckmarks, we have inserted Heartbeats segment code and libraries. It should build successfully by runnning each Makefile under the benchmark directory.
 
-Second, RAPL stuff.... 
-
-Build the library and test binaries:
-
-$ make
-
-Run the tests:
-
-$ export LD_LIBRARY_PATH="./lib"
-$ ./bin/[test_binary] [num_beats] [target_rate] [window_size]
-
-The num_beats is the number of total heartbeats the application will cycle
-through before exiting. The target_rate is the number of heartbeats per second,
-and the window size is the number of heartbeats used to calculate the heartbeat
-rate. It doesn't make sense to give the test binary a target heartbeat rate
-without knowing the normal heartbeat rate of the application on your system. To
-find this, run:
-
-$ ./bin/[test_binary] [num_beats] 0 [window_size]
-
-If you aren't sure what parameters to use, a good place to start is 200 beats
-and a window size of 20.
-
-IMPORTANT NOTE: The tests will not run until the environment variable
+IMPORTANT NOTE: The heartbeat inserted program will not run until the environment variable
 HEARTBEAT_ENABLED_DIR is set, which is required by the Heartbeats library.
 Just set it to a temporary directory:
-
 $ export HEARTBEAT_ENABLED_DIR=/tmp
 
+In the benchmark patches, we include scripts to show how to run each of the benchmark.
 
-Installing/Uninstalling POET
-----------------------------------------
-To install PUPiL to the local system, run:
+Second, make sure MSRs are enabled for RAPL and also sudo privilege is required.
 
-$ make install
+Build the RAPL interface tools:
+Go under the PUPiL/src/RAPL
+$ make
+Check out the README file under the RAPL sub-directory for the usage of those tools.
 
-Headers are installed to /usr/local/include/poet.
-The library is installed to /usr/local/lib.
-
-To uninstall PUPiL, run:
-
-$ make uninstall
 
 
 Directory Structure
