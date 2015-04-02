@@ -33,5 +33,5 @@ Directory Structure
 .  
 ├── config    -- Default and example configuration files  
 ├── inc       -- Header files  
-├── src       -- Source files   
-└── test      -- Test source files 
+├── src       -- Source files  
+└── test      -- Test source files
