@@ -26,6 +26,7 @@ Go under the PUPiL/src/RAPL
 $ make  
 Check out the README file under the RAPL sub-directory for the usage of those tools.  
 
+More examples on running software decision tree approach and hybrid approach to see README file under src directory.  
 
 
 Directory Structure  
