@@ -1,0 +1,16 @@
+Run example:
+
+RaplPowerLimitDisable:
+
+./RaplPowerLimitDisable #setting both chip to 500W limit to disbale the functionality of RAPL
+
+RaplPowerMonitor:
+
+./RaplPowerMonitor # Monitor the on-chip power of both sockets of the interval 100ms for a total time window 20 seconds and write the power data into socket_power.txt
+
+RaplSetPowerSeprate:
+
+./RaplSetPowerSeprate [power_limit1] [power_limit2]
+#power_limit1 and power_limit2 is the power cap for chip node 1 and chip node 2 respectively 
+
+
