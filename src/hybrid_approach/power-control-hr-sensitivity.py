@@ -96,8 +96,6 @@ class PowerControl:
         while (head +1 <tail):
             MidPointer = (head + tail)/2
             self.PerfDictionary[(CoreNumber,MidPointer,2)],self.PwrDictionary[(CoreNumber,MidPointer,2)] = self.GetFeedback((CoreNumber,MidPointer,2))
-            print 11111111111,self.PwrDictionary[(CoreNumber,MidPointer,2)], self.PwrCap
-            print 11111111111,(self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap)
             if (self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap):
                 head = MidPointer
             else:
@@ -284,7 +282,6 @@ class PowerControl:
         
         if self.CurCore != CoreNumber:
             if CoreNumber <33:
-                #print "for i in $(pgrep "+self.AppNameShort+" | xargs pstree -p|grep -o \"([[:digit:]]*)\" |grep -o \"[[:digit:]]*\");do sudo taskset -pc 0-"+str(CoreNumber-1)+" $i & done"
                 print self.AppNameShort
             #    os.system("for i in $(pgrep "+self.AppName+" | xargs ps -mo pid,tid,fname,user,psr -p | awk 'NR > 2  {print $2}');do sudo taskset -pc 0-"+str(CoreNumber-1)+" $i > /dev/null & done")
                 result1 = subprocess.check_output("for i in $(pgrep "+self.AppNameShort+" | xargs pstree -p|grep -o \"([[:digit:]]*)\" |grep -o \"[[:digit:]]*\");do sudo taskset -pc 0-"+str(CoreNumber-1)+" $i & done",shell=True)
@@ -327,12 +324,4 @@ file = open("converged_configuration",'a')
 file.write(str(PC.PwrCap)+" ("+str(PC.CoreNumber)+","+str(PC.frequency)+","+str(PC.MemoCtrl)+")")
 print result,"finished"
 
-
-#pgrep jacobi| sudo xargs taskset -pc 0-13
-#pgrep jacobi | sudo xargs kill -9
-#pgrep jacobi | xargs ps -mo pid,tid,fname,user,psr -p
-#for i in $(pgrep jacobi | xargs ps -mo pid,tid,fname,user,psr -p | awk '// {print $2}'): print $i
-#j= 0;for i in $(pgrep para | xargs ps -mo pid,tid,fname,user,psr -p | awk 'NR > 2  {print $2}');do echo $i; sudo taskset -pc $j $i; j=`expr $j + 1`; done
-#j =0;for i in $(pgrep nn | xargs ps -mo pid,tid,fname,user,psr -p | awk 'NR > 2  {print $2}');do sudo taskset -pc $j-$j $i; j=`expr $j + 1`; done
-#j =0;for i in $(pgrep xasxa | xargs pstree -p|grep -o "([[:digit:]]*)" |grep -o "[[:digit:]]*");do sudo taskset -pc 0-31 $i; j=`expr $j + 1`; done
 

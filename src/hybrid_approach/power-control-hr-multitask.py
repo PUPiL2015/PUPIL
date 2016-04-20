@@ -18,14 +18,11 @@ class PowerControl:
             self.AppNameShort.append(appnameShort)
         self.standardPerf = standardPerf
         #self.standardPerf = [11.245919,143.834678,327.098961,4.777705]
-        #self.standardPerf = [0.0, 0.0, 0.0, 0.0]
         self.PwrCap = float(PwrCap)
-      #  self.isFinished = 0
         self.phase = 0
         self.PerfDictionary = {(0,0,0):0}
         self.PwrDictionary = {(0,0,0):0}
         self.CurConfig = (0,0,0)
-       # self.NextConfig = (0,0,0)
         self.CoreNumber = 0
         self.frequency = 16
         for i in range(len(CommandLine)):
@@ -102,8 +99,6 @@ class PowerControl:
         while (head +1 <tail):
             MidPointer = (head + tail)/2
             self.PerfDictionary[(CoreNumber,MidPointer,2)],self.PwrDictionary[(CoreNumber,MidPointer,2)] = self.GetFeedback((CoreNumber,MidPointer,2))
-            print 11111111111,self.PwrDictionary[(CoreNumber,MidPointer,2)], self.PwrCap
-            print 11111111111,(self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap)
             if (self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap):
                 head = MidPointer
             else:
@@ -164,23 +159,16 @@ class PowerControl:
                         
             return 1
                 
-#get the heartbeat info
+    #get the heartbeat info
     def GetFeedback(self,config):
         print config
-        #PowerFileName = 'socket_power.txt'
         PerfFileName = []
         for name in self.HeartbeatFileName:
             PerfFileName.append(name+'_heartbeat.log')
 
-        #PerfFileName = self.CurFolder+'heartbeat.log'
-        #PerfFileName = 'heartbeat.log'
         if config in self.PerfDictionary:
             return self.PerfDictionary[config], self.PwrDictionary[config]
         else:
-           # subprocess.call([SET_SPEED, "-S", str(16-self.CurConfig[1])])
-           # subprocess.call(["sudo","-E","numactl","--interleave=0-"+str(self.CurConfig[2]-1),"--physcpubind=0-"+str(self.CurConfig[0]-1),ExeFileName])
-         #   self.RunApp(config[0],config[1],config[2])
-         
             self.AdjustConfig(config[0],config[1],config[2])
 
             self.GetPowerDistAndSet(config[0])
@@ -190,56 +178,31 @@ class PowerControl:
 
             for i in range(len(PerfFileName)):
             
-            
-        #    PowerFile = open(PowerFileName,'r')
                 PerfFile = open(PerfFileName[i],'r')
-        #    PowerFileLines= PowerFile.readlines()
                 PerfFileLines= PerfFile.readlines()[1:]
                 self.PerfFileLength[i] = len(PerfFileLines)
                 
             for i in range(len(PerfFileName)):
                 PerfFile = open(PerfFileName[i],'r')
-        #    PowerFileLines= PowerFile.readlines()
                 PerfFileLines= PerfFile.readlines()[1:]
-         #   if int(config[0]) == 40 and int(config[1]==1):
-          #      time.sleep(4)
-        #        print "sleep 5"
-         #   counter = 0
                 print "len(PerfFileLines)", len(PerfFileLines)
                 print "self.PerfFileLength",self.PerfFileLength
                 print "wait...."
                 while ((len(PerfFileLines) - self.PerfFileLength[i]) <5 or (time.time()- TmpTime < 5))and((len(PerfFileLines) - self.PerfFileLength[i]) < 3 or (time.time()- TmpTime < 10)):
-                #while (((len(PerfFileLines) - self.PerfFileLength[i]) <8))or(time.time()- TmpTime < 5):
 
-              #  PowerFile.close()
                     PerfFile.close()
-                #get Socket Power
                     time.sleep(0.1)
-              #  print "sleep 0.1"
-               # print "get Socket Power"
-              #  os.system("sudo "+RAPL_POWER_MON)
-              #  PowerFile = open(PowerFileName,'r')
+
                     PerfFile = open(PerfFileName[i],'r')
-             #   PowerFileLines= PowerFile.readlines()
                     PerfFileLines= PerfFile.readlines()[1:]
-                #   counter += 1
-             #   print PowerFileLines
-                # if counter % 10 == 0:
-                    #   os.system(POWER_MON+" stop > power.txt")
                 print "waiting time: "+str(time.time() - TmpTime)
                 
-                #os.system("sudo "+RAPL_POWER_MON)
-                
+
             for i in range(len(PerfFileName)):
                 PerfFile = open(PerfFileName[i],'r')
                 PerfFileLines= PerfFile.readlines()[1:]
-         #       PowerFile = open(PowerFileName,'r')
-          #      PowerFileLines= PowerFile.readlines()
-            
+
                 CurLength = len(PerfFileLines) - self.PerfFileLength[i]
-                # print "sleep 0.1"
-            #os.system("ps -ef | grep "+self.CurFolder+self.AppName+" | awk '{print $2}' | sudo xargs kill -9")
-           # os.system("ps -ef | grep "+self.CurFolder+self.AppName+" | awk '{print $2}' | sudo xargs kill -9")
                 SumPerf = 0.0
                 j =0
                 AvergeInterval = 0.0
@@ -375,7 +338,6 @@ NormolizedPerfList=[0.0, 0.0, 0.0, 0.0]
 NormolizedPerf= 0.0
 print 'PC.standardPerf', PC.standardPerf
 for j in range(len(PC.AppNameShort)):
-    print "sudo pkill "+PC.AppNameShort[j]+"1111111111111111111111111111111111111111111111111111111111111111111111111111111"
     os.system("sudo pkill "+PC.AppNameShort[j])
     file = open(PC.HeartbeatFileName[j]+'_heartbeat.log','r')
     CurLength = len(file.readlines()[1:])

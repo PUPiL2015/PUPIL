@@ -1,0 +1,26 @@
+This is the hybrid approaches combining software decision tree and RAPL hardware approach.
+
+Content
+----------------------------------------
+power-control-hr.py: hybrid approach which uses taskset to change the parent process’s affinity to achieve thread migration.(existing children threads not migrating)
+power-control-hr-ptree.py: on top of power-control-hr.py further uses pstree command to get the whole process tree(parent thread and all its children thread) and bind each of these thread to desired cores.(existing children threads migrating)
+power-control-multitask.py: for running multiple applications together, default 4 applications.
+power-control-sensitivity.py: a different version of decision tree which decides hyper-thread resource ahead of the socket resource to check the resource order sensitivity.
+
+Running PUPiL Examples
+----------------------------------------
+python power-control-hr.py <power_cap> <process_name> <running command for the application>
+
+python power-control-hr-pstree.py <power_cap> <process_name> <running command for the application> 
+
+python power-control-hr-multitask.py <power_cap> <config_file>
+	config_file format:
+	each column: <application_name> <process_name> <standard_performance> <running command>	
+
+python power-control-hr-sensitivity.py <power_cap> <process_name> <running command for the application>
+
+Notice
+----------------------------------------
+
+1. In the python files, RAPL tools are used by absolute path. So you have to change it to your own path.
+2. Your cpu id mapping is likely different from mine, change the code accordingly.(Mine is 0-7: physical core on the first socket, 8-15: physical core on the second socket, 16-23: hyperthread of first socket, 24-31: hyperthread of second socket)

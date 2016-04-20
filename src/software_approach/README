@@ -1,0 +1,9 @@
+Content
+----------------------------------------
+power-control-h.py: software decision tree approach
+regresssion_modeling.py: simple linear regression prediction model
+
+Running PUPiL Examples
+----------------------------------------
+python power-control-h.py <power_cap> <process_name> <running command for the application>
+python regreesion_modeling.py (need to set up the performance file paths)

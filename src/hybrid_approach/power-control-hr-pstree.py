@@ -3,6 +3,7 @@ import time
 import os
 import sys
 import math
+import numpy
 StartTime = time.time()
 SET_SPEED = "/home/hankhoffmann/tools/powerQoS/pySetCPUSpeed.py"
 POWER_MON = "/home/hankhoffmann/tools/powerQoS/pyWattsup-hank.py"
@@ -94,8 +95,6 @@ class PowerControl:
         while (head +1 <tail):
             MidPointer = (head + tail)/2
             self.PerfDictionary[(CoreNumber,MidPointer,2)],self.PwrDictionary[(CoreNumber,MidPointer,2)] = self.GetFeedback((CoreNumber,MidPointer,2))
-            print 11111111111,self.PwrDictionary[(CoreNumber,MidPointer,2)], self.PwrCap
-            print 11111111111,(self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap)
             if (self.PwrDictionary[(CoreNumber,MidPointer,2)] < self.PwrCap):
                 head = MidPointer
             else:
@@ -217,27 +216,31 @@ class PowerControl:
            # os.system("ps -ef | grep "+self.CurFolder+self.AppName+" | awk '{print $2}' | sudo xargs kill -9")
             SumPerf = 0
             j =0
-            AvergeInterval = 0
+            AvergeInterval = 0.0
             heartbeat = 0.0
             if self.PerfFileLength == 0:
                 CurLength = CurLength -1
-            print "long(PerfFileLines[-1].split()[2])=",long(PerfFileLines[-1].split()[2])
-            print "long(PerfFileLines[-CurLength-1].split()[2])=",long(PerfFileLines[-CurLength-1].split()[2])
+           # print "long(PerfFileLines[-1].split()[2])=",long(PerfFileLines[-1].split()[2])
+           # print "long(PerfFileLines[-CurLength-1].split()[2])=",long(PerfFileLines[-CurLength-1].split()[2])
             TotalInterval =(long(PerfFileLines[-1].split()[2]) - long(PerfFileLines[-CurLength-1].split()[2]))
 
             AvergeInterval = TotalInterval/ float(CurLength)
-            
+            TimeIntervalList =[]
             for i in range(-CurLength,0):
                 LinePerf = PerfFileLines[i].split()
-
                 TimeInterval = long(LinePerf[2]) - long(PerfFileLines[i-1].split()[2])
+                TimeIntervalList.append(TimeInterval)
                 
-                heartbeat = heartbeat + 1
-                if TimeInterval < AvergeInterval / 100 :
-                    heartbeat = heartbeat - 1
-                SumPerf +=  float(LinePerf[4])
-            AvgPerf = heartbeat/TotalInterval
-            
+             #   heartbeat = heartbeat + 1
+             #   if TimeInterval < AvergeInterval / 100 :
+             #       heartbeat = heartbeat - 1
+             #   SumPerf +=  float(LinePerf[4])
+            variance = numpy.var(TimeInterval)
+            for interval in TimeIntervalList:
+                if interval > AvergeInterval + 3 * variance or interval < AvergeInterval - 3 * variance :
+                    TimeIntervalList.remove(interval)
+          #  AvgPerf = heartbeat/TotalInterval
+            AvgPerf = len(TimeIntervalList)/ sum(TimeIntervalList)
             j = 0
             SumPwr = 0
             for i in range(len(PowerFileLines)):
@@ -313,13 +316,4 @@ os.system("echo "+str(Endlength - StartLength)+" >> Length.txt")
 file = open("converged_configuration",'a')
 file.write(str(PC.PwrCap)+" ("+str(PC.CoreNumber)+","+str(PC.frequency)+","+str(PC.MemoCtrl)+")")
 print result,"finished"
-
-
-#pgrep jacobi| sudo xargs taskset -pc 0-13
-#pgrep jacobi | sudo xargs kill -9
-#pgrep jacobi | xargs ps -mo pid,tid,fname,user,psr -p
-#for i in $(pgrep jacobi | xargs ps -mo pid,tid,fname,user,psr -p | awk '// {print $2}'): print $i
-#j= 0;for i in $(pgrep para | xargs ps -mo pid,tid,fname,user,psr -p | awk 'NR > 2  {print $2}');do echo $i; sudo taskset -pc $j $i; j=`expr $j + 1`; done
-#j =0;for i in $(pgrep nn | xargs ps -mo pid,tid,fname,user,psr -p | awk 'NR > 2  {print $2}');do sudo taskset -pc $j-$j $i; j=`expr $j + 1`; done
-#j =0;for i in $(pgrep xasxa | xargs pstree -p|grep -o "([[:digit:]]*)" |grep -o "[[:digit:]]*");do sudo taskset -pc 0-31 $i; j=`expr $j + 1`; done
 

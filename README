@@ -28,12 +28,13 @@ Check out the README file under the RAPL sub-directory for the usage of those to
 
 More examples on running software decision tree approach and hybrid approach to see README file under src directory.  
 
+any question plz contact huazhe@cs.uchicago.edu
 
 Directory Structure  
 ----------------------------------------  
 .  
-├── config    -- Default and example configuration files  
-├── inc       -- Header files  
-├── src       -- Source files  
-└── test      -- Test source files
-
+├── lib       -- Heartbeat libraries  
+├── patches   -- Application patches including some running scripts   
+├── src       -- Source files 
+├── scripts   -- Scripts used to collect data 
+└── tools     -- Tools for setting cpu frequency or collecting power through Wattsup
