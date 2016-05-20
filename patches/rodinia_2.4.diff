@@ -1139,6 +1139,57 @@ index 0000000..d671019
 +
 +
 +
+diff --git a/openmp/backprop/Makefile b/openmp/backprop/Makefile
+index 5db709f..fe31ef5 100755
+--- a/openmp/backprop/Makefile
++++ b/openmp/backprop/Makefile
+@@ -1,25 +1,26 @@
+ # C compiler
+ CC = gcc
+-CC_FLAGS = -g -fopenmp  -O2
++CC_FLAGS = -g -fopenmp -O2
++Heartbeat = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ 
+ 
+ backprop: backprop.o facetrain.o imagenet.o backprop_kernel.o 
+-	$(CC) $(CC_FLAGS) backprop.o facetrain.o imagenet.o backprop_kernel.o -o backprop -lm
++	$(CC) $(CC_FLAGS) backprop.o facetrain.o imagenet.o backprop_kernel.o -o backprop -lm $(Heartbeat)
+ 
+ %.o: %.[ch]
+-	$(CC) $(CC_FLAGS) $< -c
++	$(CC) $(CC_FLAGS) $< -c $(Heartbeat)
+ 
+ facetrain.o: facetrain.c backprop.h
+-	$(CC) $(CC_FLAGS) facetrain.c -c
++	$(CC) $(CC_FLAGS) facetrain.c -c $(Heartbeat)
+ 	
+ backprop.o: backprop.c backprop.h
+-	$(CC) $(CC_FLAGS) backprop.c -c
++	$(CC) $(CC_FLAGS) backprop.c -c $(Heartbeat)
+ 
+ backprop_kernel.o: backprop_kernel.c backprop.h
+-	$(CC) $(CC_FLAGS) backprop_kernel.c -c
++	$(CC) $(CC_FLAGS) backprop_kernel.c -c $(Heartbeat)
+ 
+ imagenet.o: imagenet.c backprop.h
+-	$(CC) $(CC_FLAGS) imagenet.c -c
++	$(CC) $(CC_FLAGS) imagenet.c -c $(Heartbeat)
+ 
+ 
+ clean:
+diff --git a/openmp/backprop/backprop.h b/openmp/backprop/backprop.h
+index f04cacf..a42eca1 100755
+--- a/openmp/backprop/backprop.h
++++ b/openmp/backprop/backprop.h
+@@ -6,7 +6,7 @@
+ 
+ #define ETA 0.3       //eta value
+ #define MOMENTUM 0.3  //momentum value
+-#define NUM_THREAD 8 //OpenMP threads
++#define NUM_THREAD 32 //OpenMP threads
+ 
+ 
+ typedef struct {
 diff --git a/openmp/backprop/backprop32threads.results b/openmp/backprop/backprop32threads.results
 new file mode 100755
 index 0000000..65ce79d
@@ -2271,6 +2322,62 @@ index 0000000..ef40538
 +
 +
 +
+diff --git a/openmp/backprop/backprop_kernel.c b/openmp/backprop/backprop_kernel.c
+index 3e40d38..7d24466 100755
+--- a/openmp/backprop/backprop_kernel.c
++++ b/openmp/backprop/backprop_kernel.c
+@@ -5,7 +5,8 @@
+ #include <sys/time.h>
+ 
+ #include "backprop.h"
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+ extern void bpnn_layerforward(float *l1, float *l2, float **conn, int n1, int n2);
+@@ -35,7 +36,24 @@ double gettime() {
+ int
+ main( int argc, char** argv) 
+ {
++	int ii = 20;
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "backprop_heartbeat.log");
++        printf("heartbeat initialed \n");
++        for(ii_tmp = 0; ii_tmp < ii; ii_tmp++){        
+ 	setup(argc, argv);
++	
++	heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        printf("heartbeat# = %d \n", ii_tmp);
++	}
++        heartbeat_finish(&heart);
++	exit(0);
+ }
+ 
+ 
+diff --git a/openmp/backprop/facetrain.c b/openmp/backprop/facetrain.c
+index 5e5a304..5f6e000 100755
+--- a/openmp/backprop/facetrain.c
++++ b/openmp/backprop/facetrain.c
+@@ -41,5 +41,4 @@ char *argv[];
+   bpnn_initialize(seed);
+   backprop_face();
+ 
+-  exit(0);
+ }
+diff --git a/openmp/backprop/run b/openmp/backprop/run
+index ad8c843..d90f49e 100755
+--- a/openmp/backprop/run
++++ b/openmp/backprop/run
+@@ -1 +1 @@
+-./backprop 65536
++./backprop 60000000
 diff --git a/openmp/bfs/bfs32threads.results b/openmp/bfs/bfs32threads.results
 new file mode 100755
 index 0000000..dfa383f
