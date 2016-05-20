@@ -1,3 +1,23 @@
+diff --git a/openmp/b+tree/Makefile b/openmp/b+tree/Makefile
+index 0cfcb74..7a89682 100644
+--- a/openmp/b+tree/Makefile
++++ b/openmp/b+tree/Makefile
+@@ -1,12 +1,12 @@
+-C_C = gcc
+-OMP_LIB = -lgomp
++C_C = gcc -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
++OMP_LIB = -lgomp -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ OMP_FLAG = -fopenmp
+ 
+ # ========================================================================================================================================================================================================200
+ #	EXECUTABLES (LINK OBJECTS TOGETHER INTO BINARY)
+ # ========================================================================================================================================================================================================200
+ 
+-b+tree.out:	./main.o \
++btree.out:	./main.o \
+ 		./kernel/kernel_cpu.o \
+ 		./kernel/kernel_cpu_2.o \
+ 		./util/timer/timer.o \
 diff --git a/openmp/b+tree/btree32threads.results b/openmp/b+tree/btree32threads.results
 new file mode 100755
 index 0000000..811b9eb
@@ -1139,6 +1159,59 @@ index 0000000..d671019
 +
 +
 +
+diff --git a/openmp/b+tree/main.c b/openmp/b+tree/main.c
+index 6ee2bcf..2a6b03f 100644
+--- a/openmp/b+tree/main.c
++++ b/openmp/b+tree/main.c
+@@ -62,7 +62,8 @@
+ // #include <sys/time.h>							// (in directory known to compiler)			needed by ???
+ #include <math.h>									// (in directory known to compiler)			needed by log, pow
+ #include <string.h>									// (in directory known to compiler)			needed by memset
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //======================================================================================================================================================150
+ //	COMMON
+ //======================================================================================================================================================150
+@@ -1844,8 +1845,17 @@ int
+ main(	int argc, 
+ 		char** argv ) 
+ {
+-	// assing default values
+-	int cur_arg;
++	int ii = 100;
++        int ii_tmp = 0;
++	heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "btree_heartbeat.log");    
++        for(ii_tmp = 0; ii_tmp < ii; ii_tmp++){
++        // assing default values
++	printf("iteration = %d", ii_tmp);
++        int cur_arg;
+ 	int cores_arg =1;
+ 	char *input_file = NULL;
+ 	char *command_file = NULL;
+@@ -2413,12 +2423,17 @@ main(	int argc,
+ 
+ 	}
+ 	printf("\n");
++        heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
+ 
++        hb_get_current(&heart, &record);
++  }
+ 	// ------------------------------------------------------------60
+ 	// free remaining memory and exit
+ 	// ------------------------------------------------------------60
+-
++        heartbeat_finish(&heart);
+ 	free(mem);
++     
+ 	return EXIT_SUCCESS;
+ 
+ }
 diff --git a/openmp/backprop/Makefile b/openmp/backprop/Makefile
 index 5db709f..fe31ef5 100755
 --- a/openmp/backprop/Makefile
@@ -2378,6 +2451,57 @@ index ad8c843..d90f49e 100755
 @@ -1 +1 @@
 -./backprop 65536
 +./backprop 60000000
+diff --git a/openmp/bfs/Makefile b/openmp/bfs/Makefile
+index aaacea5..753a217 100755
+--- a/openmp/bfs/Makefile
++++ b/openmp/bfs/Makefile
+@@ -1,9 +1,9 @@
+ # C compiler
+ CC = g++
+-CC_FLAGS = -g -fopenmp -O2
++CC_FLAGS = -g -fopenmp -O2 
+ 
+ bfs: 
+-	$(CC) $(CC_FLAGS) bfs.cpp -o bfs 
++	$(CC) $(CC_FLAGS) bfs.cpp -o bfs -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared 
+ 
+ clean:
+ 	rm -f bfs result.txt
+diff --git a/openmp/bfs/bfs.cpp b/openmp/bfs/bfs.cpp
+index ef90663..c5d317d 100755
+--- a/openmp/bfs/bfs.cpp
++++ b/openmp/bfs/bfs.cpp
+@@ -3,6 +3,9 @@
+ #include <math.h>
+ #include <stdlib.h>
+ #include <omp.h>
++
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //#define NUM_THREAD 4
+ #define OPEN
+ 
+@@ -31,7 +34,20 @@ int main( int argc, char** argv)
+ {
+ 	no_of_nodes=0;
+ 	edge_list_size=0;
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "heartbeat.log");
++        
++	for(ii_tmp = 0; ii_tmp < 1000; ii_tmp++){
+ 	BFSGraph( argc, argv);
++	heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++	}
++	heartbeat_finish(&heart);
+ }
+ 
+ 
 diff --git a/openmp/bfs/bfs32threads.results b/openmp/bfs/bfs32threads.results
 new file mode 100755
 index 0000000..dfa383f
@@ -3512,6 +3636,14 @@ index 0000000..b270095
 +
 +
 +
+diff --git a/openmp/bfs/run b/openmp/bfs/run
+index 0f0841a..82a705d 100755
+--- a/openmp/bfs/run
++++ b/openmp/bfs/run
+@@ -1 +1 @@
+-./bfs 4 ../../data/bfs/graph1MW_6.txt 
+\ No newline at end of file
++./bfs 4 ../../data/bfs/graph1MW_6.txt 
 diff --git a/openmp/cfd/cfd1socket.results b/openmp/cfd/cfd1socket.results
 new file mode 100755
 index 0000000..7bed1d2
@@ -5242,6 +5374,93 @@ index 0000000..3e729fb
 +
 +
 +
+diff --git a/openmp/cfd/euler3d_cpu.cpp b/openmp/cfd/euler3d_cpu.cpp
+index 01a1d2b..3ad795e 100755
+--- a/openmp/cfd/euler3d_cpu.cpp
++++ b/openmp/cfd/euler3d_cpu.cpp
+@@ -2,11 +2,13 @@
+ // This code is from the AIAA-2009-4001 paper
+ 
+ 
++
+ #include <iostream>
+ #include <fstream>
+ #include <cmath>
+ #include <omp.h>
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ struct float3 { float x, y, z; };
+ 
+ #ifndef block_length
+@@ -22,7 +24,7 @@ struct float3 { float x, y, z; };
+  *
+  */
+ #define GAMMA 1.4
+-#define iterations 2000
++#define iterations 5000
+ 
+ #define NDIM 3
+ #define NNB 4
+@@ -339,6 +341,12 @@ void time_step(int j, int nelr, float* old_variables, float* variables, float* s
+  */
+ int main(int argc, char** argv)
+ {
++	heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "cfd_heartbeat.log");
++        printf("heartbeat initialed \n");
+ 	if (argc < 2)
+ 	{
+ 		std::cout << "specify data file name" << std::endl;
+@@ -449,6 +457,9 @@ int main(int argc, char** argv)
+ 			compute_flux(nelr, elements_surrounding_elements, normals, variables, fluxes);
+ 			time_step(j, nelr, old_variables, variables, step_factors, fluxes);
+ 		}
++                  heartbeat(&heart, iterations, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
+ 	}
+ 
+ #ifdef _OPENMP
+@@ -471,7 +482,7 @@ int main(int argc, char** argv)
+ 	dealloc<float>(old_variables);
+ 	dealloc<float>(fluxes);
+ 	dealloc<float>(step_factors);
+-
++	heartbeat_finish(&heart);
+ 	std::cout << "Done..." << std::endl;
+ 
+ 	return 0;
+diff --git a/openmp/cfd/makefile b/openmp/cfd/makefile
+index 8fe5d3e..69a51c3 100755
+--- a/openmp/cfd/makefile
++++ b/openmp/cfd/makefile
+@@ -1,8 +1,8 @@
+ CUDA_SDK_PATH = /af10/sc5nf/NVIDIA_CUDA_SDK
+ 
+-OMP_NUM_THREADS = 8
+-
+-all: euler3d_cpu euler3d_cpu_double pre_euler3d_cpu pre_euler3d_cpu_double
++OMP_NUM_THREADS = 32
++Heartbeat = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
++all: euler3d_cpu_16 euler3d_cpu_double pre_euler3d_cpu pre_euler3d_cpu_double
+ 
+ #euler3d: euler3d.cu
+ #	nvcc -Xptxas -v -O3 --gpu-architecture=compute_13 --gpu-code=compute_13 euler3d.cu -o euler3d -I$(CUDA_SDK_PATH)/common/inc  -L$(CUDA_SDK_PATH)/lib  -lcutil
+@@ -10,8 +10,8 @@ all: euler3d_cpu euler3d_cpu_double pre_euler3d_cpu pre_euler3d_cpu_double
+ #euler3d_double: euler3d_double.cu
+ #	nvcc -Xptxas -v -O3 --gpu-architecture=compute_13 --gpu-code=compute_13 euler3d_double.cu -o euler3d_double -I$(CUDA_SDK_PATH)/common/inc  -L$(CUDA_SDK_PATH)/lib  -lcutil
+ 
+-euler3d_cpu: euler3d_cpu.cpp
+-	g++ -O3 -Dblock_length=$(OMP_NUM_THREADS) -fopenmp euler3d_cpu.cpp -o euler3d_cpu
++euler3d_cpu_16: euler3d_cpu.cpp
++	g++ -O3 -Dblock_length=$(OMP_NUM_THREADS) -fopenmp euler3d_cpu.cpp -o euler3d_cpu $(Heartbeat)
+ euler3d_cpu_double: euler3d_cpu_double.cpp
+ 	g++ -O3 -Dblock_length=$(OMP_NUM_THREADS) -fopenmp euler3d_cpu_double.cpp -o euler3d_cpu_double
+ 
 diff --git a/openmp/heartwall/heartwall32threads.results b/openmp/heartwall/heartwall32threads.results
 new file mode 100755
 index 0000000..8df3369
@@ -5387,6 +5606,89 @@ index 0000000..f1288ee
 +
 +
 +
+diff --git a/openmp/heartwall/main.c b/openmp/heartwall/main.c
+index a54625a..7f17a96 100755
+--- a/openmp/heartwall/main.c
++++ b/openmp/heartwall/main.c
+@@ -15,7 +15,8 @@
+ 
+ #include "define.c"
+ #include "kernel.c"
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //===============================================================================================================================================================================================================
+ //===============================================================================================================================================================================================================
+ //	MAIN FUNCTION
+@@ -31,7 +32,11 @@ int main(int argc, char *argv []){
+ 	// counters
+ 	int i;
+ 	int frames_processed;
+-
++	        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "heartwall_heartbeat.log");
+ 	// parameters
+ 	public_struct public;
+ 	private_struct private[ALL_POINTS];
+@@ -490,7 +495,9 @@ int main(int argc, char *argv []){
+ 	//====================================================================================================
+ 	//	PRINT FRAME PROGRESS
+ 	//====================================================================================================
+-
++		heartbeat(&heart, public.frame_no, 1);
++        	heartbeat_record_t record;
++        	hb_get_current(&heart, &record);
+ 		printf("%d ", public.frame_no);
+ 		fflush(NULL);
+ 
+@@ -550,6 +557,7 @@ int main(int argc, char *argv []){
+ 		free(private[i].d_tMask);
+ 		free(private[i].d_mask_conv);
+ 	}
++	heartbeat_finish(&heart);
+ 
+ }
+ 
+diff --git a/openmp/heartwall/makefile b/openmp/heartwall/makefile
+index 4a7aaa7..7c51e18 100755
+--- a/openmp/heartwall/makefile
++++ b/openmp/heartwall/makefile
+@@ -1,10 +1,10 @@
+ # link objects(binaries) together
+ heartwall: main.o ./AVI/avilib.o ./AVI/avimod.o
+-	gcc main.o ./AVI/avilib.o ./AVI/avimod.o -lm -fopenmp -o heartwall
++	gcc main.o ./AVI/avilib.o ./AVI/avimod.o -lm -fopenmp -o heartwall -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ 
+ # compile main function file into object (binary)
+ main.o: main.c define.c kernel.c
+-	gcc main.c -I./AVI -c -O3 -fopenmp
++	gcc main.c -I./AVI -c -O3 -fopenmp -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ 
+ ./AVI/avilib.o ./AVI/avimod.o:
+ 	cd AVI; make;
+diff --git a/openmp/heartwall/run b/openmp/heartwall/run
+index 5ae00f2..9c3964d 100755
+--- a/openmp/heartwall/run
++++ b/openmp/heartwall/run
+@@ -1 +1 @@
+-./heartwall ../../data/heartwall/test.avi 5 4
++./heartwall ../../data/heartwall/test.avi 50 32
+diff --git a/openmp/hotspot/Makefile b/openmp/hotspot/Makefile
+index 92b1da3..39a06d6 100755
+--- a/openmp/hotspot/Makefile
++++ b/openmp/hotspot/Makefile
+@@ -3,7 +3,7 @@ CC = g++
+ CC_FLAGS = -g -fopenmp -O2
+ 
+ hotspot: 
+-	$(CC) $(CC_FLAGS) hotspot_openmp.cpp -o hotspot 
++	$(CC) $(CC_FLAGS) hotspot_openmp.cpp -o hotspot  -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared  
+ 
+ clean:
+ 	rm -f hotspot
 diff --git a/openmp/hotspot/hotspot32threads.sh b/openmp/hotspot/hotspot32threads.sh
 new file mode 100755
 index 0000000..9674587
@@ -5468,6 +5770,49 @@ index 0000000..9674587
 +
 +
 +
+diff --git a/openmp/hotspot/hotspot_openmp.cpp b/openmp/hotspot/hotspot_openmp.cpp
+index dc94064..316af19 100755
+--- a/openmp/hotspot/hotspot_openmp.cpp
++++ b/openmp/hotspot/hotspot_openmp.cpp
+@@ -24,7 +24,8 @@ double chip_width = 0.016;
+ double amb_temp = 80.0;
+ 
+ int num_omp_threads;
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ /* Single iteration of the transient solver in the grid model.
+  * advances the solution of the discretized difference equations 
+  * by one time step
+@@ -200,6 +201,15 @@ void usage(int argc, char **argv)
+ 
+ int main(int argc, char **argv)
+ {
++	int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "hotspot_heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 300; ii_tmp++){
++
+ 	int grid_rows, grid_cols, sim_time, i;
+ 	double *temp, *power, *result;
+ 	char *tfile, *pfile;
+@@ -242,7 +252,11 @@ int main(int argc, char **argv)
+ 	/* cleanup	*/
+ 	free(temp);
+ 	free(power);
+-
++	heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+ 	return 0;
+ }
+ 
 diff --git a/openmp/lavaMD/lavaMD32threads.sh b/openmp/lavaMD/lavaMD32threads.sh
 new file mode 100755
 index 0000000..7692ad5
@@ -5546,6 +5891,149 @@ index 0000000..7692ad5
 +
 +
 +
+diff --git a/openmp/lavaMD/main.c b/openmp/lavaMD/main.c
+index 96bbe6b..8d42b01 100755
+--- a/openmp/lavaMD/main.c
++++ b/openmp/lavaMD/main.c
+@@ -39,7 +39,8 @@
+ //======================================================================================================================================================150
+ 
+ #include "./kernel/kernel_cpu.h"				// (in library path specified here)
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //========================================================================================================================================================================================================200
+ //	MAIN FUNCTION
+ //========================================================================================================================================================================================================200
+@@ -52,6 +53,14 @@ main(	int argc,
+ 	//======================================================================================================================================================150
+ 	//	CPU/MCPU VARIABLES
+ 	//======================================================================================================================================================150
++	int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "lavaMD_heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 200; ii_tmp++){
+ 
+ 	// timer
+ 	long long time0;
+@@ -328,7 +337,11 @@ main(	int argc,
+ 	//======================================================================================================================================================150
+ 	//	RETURN
+ 	//======================================================================================================================================================150
+-
++	heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+ 	return 0.0;																					// always returns 0.0
+ 
+ }
+diff --git a/openmp/lavaMD/makefile b/openmp/lavaMD/makefile
+index 6162607..c50e11b 100755
+--- a/openmp/lavaMD/makefile
++++ b/openmp/lavaMD/makefile
+@@ -10,6 +10,7 @@
+ C_C = gcc
+ OMP_LIB = -lgomp
+ OMP_FLAG = -fopenmp
++H_FLAGS = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared 
+ 
+ # link objects (binaries) together
+ a.out:		main.o \
+@@ -22,7 +23,8 @@ a.out:		main.o \
+ 			./util/timer/timer.o \
+ 			-lm \
+ 			$(OMP_LIB) \
+-			-o lavaMD
++			-o lavaMD \
++			$(H_FLAGS)
+ # compile function files into objects (binaries)
+ main.o:		main.h \
+ 			main.c \
+@@ -35,7 +37,8 @@ main.o:		main.h \
+ 	$(C_C)	main.c \
+ 			-c \
+ 			-o main.o \
+-			-O3
++			-O3 \
++			$(H_FLAGS)
+ 
+ ./kernel/kernel_cpu.o:	./kernel/kernel_cpu.h \
+ 						./kernel/kernel_cpu.c
+diff --git a/openmp/lavaMD/run b/openmp/lavaMD/run
+index d25de46..60de0e8 100755
+--- a/openmp/lavaMD/run
++++ b/openmp/lavaMD/run
+@@ -1 +1,2 @@
+-./lavaMD -cores 4 -boxes1d 10
+\ No newline at end of file
++sudo -E numactl --physcpubind=0-7,16-23 ./lavaMD -cores 32 -boxes1d 10
++
+diff --git a/openmp/leukocyte/OpenMP/Makefile b/openmp/leukocyte/OpenMP/Makefile
+index 301c7bf..ef8b0a1 100755
+--- a/openmp/leukocyte/OpenMP/Makefile
++++ b/openmp/leukocyte/OpenMP/Makefile
+@@ -1,16 +1,16 @@
+ # C compiler
+ CC = gcc
+ CC_FLAGS = -g -O3 -Wall -fopenmp -I$(MATRIX_DIR)
+-
++H_FLAGS = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared 
+ # Matrix library path
+ MATRIX_DIR = ../meschach_lib
+ 
+ 
+ leukocyte: detect_main.o avilib.o find_ellipse.o track_ellipse.o misc_math.o $(MATRIX_DIR)/meschach.a
+-	$(CC) $(CC_FLAGS) -lm avilib.o find_ellipse.o track_ellipse.o misc_math.o detect_main.o -o leukocyte -lm $(MATRIX_DIR)/meschach.a -lpthread
++	$(CC) $(CC_FLAGS) -lm avilib.o find_ellipse.o track_ellipse.o misc_math.o detect_main.o -o leukocyte -lm $(MATRIX_DIR)/meschach.a -lpthread $(H_FLAGS)
+ 
+ %.o: %.[ch]
+-	$(CC) $(CC_FLAGS) $< -c
++	$(CC) $(CC_FLAGS) $< -c $(H_FLAGS)
+ 
+ detect_main.o: find_ellipse.h track_ellipse.h avilib.h
+ find_ellipse.o: avilib.h
+diff --git a/openmp/leukocyte/OpenMP/detect_main.c b/openmp/leukocyte/OpenMP/detect_main.c
+index 66227ca..fdd7c0b 100755
+--- a/openmp/leukocyte/OpenMP/detect_main.c
++++ b/openmp/leukocyte/OpenMP/detect_main.c
+@@ -1,10 +1,19 @@
+ #include "find_ellipse.h"
+ #include "track_ellipse.h"
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ 
+ int omp_num_threads = 1;
+ 
+ int main(int argc, char ** argv) {
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "leukocyte_heartbeat.log");
+ 
++        for(ii_tmp = 0; ii_tmp < 50; ii_tmp++){
+ 	// Keep track of the start time of the program
+   long long program_start_time = get_time();
+ 	
+@@ -258,6 +267,10 @@ int main(int argc, char ** argv) {
+ 	
+ 	// Report total program execution time
+     printf("\nTotal application run time: %.5f seconds\n", ((float) (get_time() - program_start_time)) / (1000*1000));
+-
++	heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+ 	return 0;
+ }
 diff --git a/openmp/leukocyte/OpenMP/leu32threads.sh b/openmp/leukocyte/OpenMP/leu32threads.sh
 new file mode 100755
 index 0000000..5852b48
@@ -7639,14 +8127,205 @@ index 0000000..9d46be2
 +
 +
 +
+diff --git a/openmp/lud/omp/Makefile b/openmp/lud/omp/Makefile
+index 5008a8e..5ae7765 100755
+--- a/openmp/lud/omp/Makefile
++++ b/openmp/lud/omp/Makefile
+@@ -57,13 +57,13 @@ endif
+ GLOBAL_INC_DIR  =
+ 
+ # ------------  private include directories  -----------------------------------
+-LOCAL_INC_DIR   = ../common
++LOCAL_INC_DIR   = ../common /home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/
+ 
+ # ------------  system libraries  (e.g. -lm )  ---------------------------------
+-SYS_LIBS        = -lm
++SYS_LIBS        = -lm -lhb-acc-pow-shared
+ 
+ # ------------  additional system library directories  -------------------------
+-GLOBAL_LIB_DIR  =
++GLOBAL_LIB_DIR  = /home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib
+ 
+ # ------------  additional system libraries  -----------------------------------
+ GLOBAL_LIBS     =
+diff --git a/openmp/lud/omp/lud.c b/openmp/lud/omp/lud.c
+index 2902a85..57bfc36 100755
+--- a/openmp/lud/omp/lud.c
++++ b/openmp/lud/omp/lud.c
+@@ -25,7 +25,7 @@
+ #include "common.h"
+ 
+ static int do_verify = 0;
+-int omp_num_threads = 1;
++int omp_num_threads = 32;
+ 
+ static struct option long_options[] = {
+   /* name, has_arg, flag, val */
+diff --git a/openmp/lud/omp/lud_omp.c b/openmp/lud/omp/lud_omp.c
+index 4a5ad73..8184ece 100755
+--- a/openmp/lud/omp/lud_omp.c
++++ b/openmp/lud/omp/lud_omp.c
+@@ -1,13 +1,24 @@
+ #include <stdio.h>
+ #include <omp.h>
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ extern int omp_num_threads;
+ 
+ void lud_omp(float *a, int size)
+ {
+      int i,j,k;
+      float sum;
++	int iteration;
++     heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "lud_heartbeat.log");
++     printf("heartbeat initialed \n");
++
+ 	 printf("num of threads = %d\n", omp_num_threads);
++  
++//     for (iteration = 0; iteration < 100; iteration++){
+      for (i=0; i <size; i++){
+ 		omp_set_num_threads(omp_num_threads);
+ #pragma omp parallel for default(none) \
+@@ -24,5 +35,10 @@ void lud_omp(float *a, int size)
+              for (k=0; k<i; k++) sum -=a[j*size+k]*a[k*size+i];
+              a[j*size+i]=sum/a[i*size+i];
+          }
++        heartbeat(&heart, i, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++//	}
+      }
++heartbeat_finish(&heart);
+ }
 diff --git a/openmp/lud/omp/lud_omp_32 b/openmp/lud/omp/lud_omp_32
 new file mode 100755
 index 0000000..2775241
 Binary files /dev/null and b/openmp/lud/omp/lud_omp_32 differ
+diff --git a/openmp/lud/run b/openmp/lud/run
+index 529f7a9..a66d74d 100755
+--- a/openmp/lud/run
++++ b/openmp/lud/run
+@@ -1,2 +1,2 @@
+ # ./omp/lud_omp -n 4 -i ../../data/lud/512.dat 
+-./omp/lud_omp -s 256 -v
+\ No newline at end of file
++./omp/lud_omp -s 5000
+diff --git a/openmp/myocyte/Makefile b/openmp/myocyte/Makefile
+index 5b40848..45beb61 100755
+--- a/openmp/myocyte/Makefile
++++ b/openmp/myocyte/Makefile
+@@ -8,10 +8,12 @@
+ 	# command n
+ 
+ # link objects(binaries) together
++H_FLAGS = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ myocyte.out:	main.o
+ 	gcc	main.o \
+ 			-lm -fopenmp \
+-	-o myocyte.out
++	-o myocyte.out \
++	$(H_FLAGS)
+ 
+ # compile main function file into object (binary)
+ main.o: 	main.c \
+@@ -25,7 +27,7 @@ main.o: 	main.c \
+ 				file.c \
+ 				timer.c
+ 	gcc	main.c \
+-			-c -O3 -fopenmp
++			-c -O3 -fopenmp $(H_FLAGS)
+ 
+ # delete all object files
+ clean:
+diff --git a/openmp/myocyte/main.c b/openmp/myocyte/main.c
+index 80de234..9200672 100755
+--- a/openmp/myocyte/main.c
++++ b/openmp/myocyte/main.c
+@@ -90,7 +90,8 @@
+ 
+ #include "file.c"
+ #include "timer.c"
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //====================================================================================================100
+ //	MAIN FUNCTION
+ //====================================================================================================100
+@@ -104,7 +105,14 @@ int main(int argc, char *argv []){
+ 	//============================================================60
+ 	//		TIME
+ 	//============================================================60
+-
++	        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 1000; ii_tmp++){
+ 	long long time0;
+ 	long long time1;
+ 	long long time2;
+@@ -371,5 +379,9 @@ int main(int argc, char *argv []){
+ //====================================================================================================100
+ //	END OF FILE
+ //====================================================================================================100
+-
++        heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+ }
+diff --git a/openmp/nn/Makefile b/openmp/nn/Makefile
+index 1fa47c0..d3096c9 100755
+--- a/openmp/nn/Makefile
++++ b/openmp/nn/Makefile
+@@ -1,7 +1,7 @@
+ LOCAL_CC = gcc -g -O3 -Wall
+ CC = gcc
+-CFLAGS = -lm -fopenmp -Wall
+-
++CFLAGS = -fopenmp -Wall
++LDFLAGS = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared -lm
+ 
+ all : nn
+ 
+diff --git a/openmp/nn/filelist_4 b/openmp/nn/filelist_4
+index dc980d2..f4c5e07 100755
+--- a/openmp/nn/filelist_4
++++ b/openmp/nn/filelist_4
+@@ -1,4 +1 @@
+-../../data/nn/cane4_0.db
+-../../data/nn/cane4_1.db
+-../../data/nn/cane4_2.db
+-../../data/nn/cane4_3.db
++/local/huazhe/rodinia_2.4/data/nn/inputGen/cane32768k.db
+diff --git a/openmp/nn/gen_dataset.sh b/openmp/nn/gen_dataset.sh
+index c2872d6..ed600ab 100755
+--- a/openmp/nn/gen_dataset.sh
++++ b/openmp/nn/gen_dataset.sh
+@@ -2,9 +2,9 @@
+ 
+ #./hurricane_gen 15690 1
+ #./hurricane_gen 21380 2
+-./hurricane_gen 42760 4
++#./hurricane_gen 42760 4
+ #./hurricane_gen 85520 8
+ #./hurricane_gen 171040 16
+-#./hurricane_gen 342080 32
++./hurricane_gen 342080 32
+ #./hurricane_gen 684160 64
+ #./hurricane_gen 21893120 2048
 diff --git a/openmp/nn/hurricane_gen b/openmp/nn/hurricane_gen
-deleted file mode 100755
-index 249462c..0000000
-Binary files a/openmp/nn/hurricane_gen and /dev/null differ
+index 249462c..3101b04 100755
+Binary files a/openmp/nn/hurricane_gen and b/openmp/nn/hurricane_gen differ
 diff --git a/openmp/nn/nn1socket.results b/openmp/nn/nn1socket.results
 new file mode 100755
 index 0000000..a5ba771
@@ -9989,6 +10668,129 @@ index 0000000..aae90be
 +
 +
 +
+diff --git a/openmp/nn/nn_openmp.c b/openmp/nn/nn_openmp.c
+index 0d90967..b02fa77 100755
+--- a/openmp/nn/nn_openmp.c
++++ b/openmp/nn/nn_openmp.c
+@@ -4,10 +4,11 @@
+ #include <math.h>
+ #include <sys/time.h>
+ #include <omp.h>
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ #define MAX_ARGS 10
+ #define REC_LENGTH 49	// size of a record in db
+-#define REC_WINDOW 10	// number of records to read at a time
++#define REC_WINDOW 200	// number of records to read at a time
+ #define LATITUDE_POS 28	// location of latitude coordinates in input record
+ #define OPEN 10000	// initial value of nearest neighbors
+ struct neighbor {
+@@ -31,6 +32,12 @@ int main(int argc, char* argv[]) {
+ 	char   sandbox[REC_LENGTH * REC_WINDOW], *rec_iter, dbname[64];
+ 	struct neighbor *neighbors = NULL;
+ 	float target_lat, target_long, tmp_lat=0, tmp_long=0;
++             heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "nn_heartbeat.log");
++     printf("heartbeat initialed \n");
+ 
+ 	if(argc < 5) {
+ 		fprintf(stderr, "Invalid set of arguments\n");
+@@ -72,7 +79,7 @@ int main(int argc, char* argv[]) {
+ 
+ 	float *z;
+ 	z  = (float *) malloc(REC_WINDOW * sizeof(float));
+-
++	int beatCount = 0;
+ 	while(!done) {
+ 		//Read in REC_WINDOW number of records
+ 		rec_count = fread(sandbox, REC_LENGTH, REC_WINDOW, fp);
+@@ -100,16 +107,21 @@ int main(int argc, char* argv[]) {
+ 				exit(0);
+ 			}
+ 		}
+-
+ 		/* Launch threads to  */
+ 		#pragma omp parallel for shared(z, target_lat, target_long) private(i, rec_iter, tmp_lat, tmp_long)
+ 		for( i = 0 ; i < rec_count ; i++ ) {
+ 			rec_iter = sandbox+(i * REC_LENGTH + LATITUDE_POS - 1);
+ 			sscanf(rec_iter, "%f %f", &tmp_lat, &tmp_long);
+ 			z[i] = sqrt(( (tmp_lat-target_lat) * (tmp_lat-target_lat) )+( (tmp_long-target_long) * (tmp_long-target_long) ));
+-		} /* omp end parallel */
+-		#pragma omp barrier
+ 
++                } /* omp end parallel */
++		#pragma omp barrier
++		if (beatCount %100 ==0 ){
++		        heartbeat(&heart, 1, 1);
++                        heartbeat_record_t record;
++                        hb_get_current(&heart, &record);
++			}
++		beatCount++;
+ 		for( i = 0 ; i < rec_count ; i++ ) {
+ 			float max_dist = -1;
+ 			int max_idx = 0;
+@@ -134,7 +146,7 @@ int main(int argc, char* argv[]) {
+ 		if( !(neighbors[j].dist == OPEN) )
+ 			fprintf(stderr, "%s --> %f\n", neighbors[j].entry, neighbors[j].dist);
+ 	}
+-
++        heartbeat_finish(&heart);
+ 	fclose(flist);
+ 	return 0;
+ }
+diff --git a/openmp/nw/Makefile b/openmp/nw/Makefile
+index 47fd8dd..6974dd4 100755
+--- a/openmp/nw/Makefile
++++ b/openmp/nw/Makefile
+@@ -3,7 +3,7 @@ CC = g++
+ CC_FLAGS = -g -fopenmp 
+ 
+ needle: 
+-	$(CC) $(CC_FLAGS) needle.cpp -o needle 
++	$(CC) $(CC_FLAGS) needle.cpp -o needle -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared  
+ 
+ clean:
+ 	rm -f needle 
+diff --git a/openmp/nw/needle.cpp b/openmp/nw/needle.cpp
+index 229ef79..887b396 100755
+--- a/openmp/nw/needle.cpp
++++ b/openmp/nw/needle.cpp
+@@ -9,6 +9,9 @@
+ #define OPENMP
+ //#define NUM_THREAD 4
+ 
++
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ ////////////////////////////////////////////////////////////////////////////////
+ // declaration, forward
+ void runTest( int argc, char** argv);
+@@ -68,8 +71,20 @@ double gettime() {
+ int
+ main( int argc, char** argv) 
+ {
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "nw_heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 20; ii_tmp++){
+     runTest( argc, argv);
+-
++        heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+     return EXIT_SUCCESS;
+ }
+ 
 diff --git a/openmp/nw/nw32threads.sh b/openmp/nw/nw32threads.sh
 new file mode 100755
 index 0000000..36e7645
@@ -10070,6 +10872,92 @@ index 0000000..36e7645
 +
 +
 +
+diff --git a/openmp/nw/run b/openmp/nw/run
+index 19c0668..c0ecea4 100755
+--- a/openmp/nw/run
++++ b/openmp/nw/run
+@@ -1 +1 @@
+-./needle 2048 10 2 
+\ No newline at end of file
++./needle 16384 100 32 
+diff --git a/openmp/particlefilter/Makefile b/openmp/particlefilter/Makefile
+index 1acc787..8d9bfb1 100755
+--- a/openmp/particlefilter/Makefile
++++ b/openmp/particlefilter/Makefile
+@@ -1,7 +1,7 @@
+ #makefile
+ 
+ openmp: ex_particle_OPENMP_seq.c
+-	gcc -lm -O3 -ffast-math -fopenmp ex_particle_OPENMP_seq.c -o particle_filter
++	gcc -O3 -fopenmp ex_particle_OPENMP_seq.c -o particle_filter -lm -ffast-math -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
+ 
+ 
+ icc_openmp: ex_particle_OPENMP_seq.c
+diff --git a/openmp/particlefilter/ex_particle_OPENMP_seq.c b/openmp/particlefilter/ex_particle_OPENMP_seq.c
+index c2ab62c..048c17e 100755
+--- a/openmp/particlefilter/ex_particle_OPENMP_seq.c
++++ b/openmp/particlefilter/ex_particle_OPENMP_seq.c
+@@ -9,6 +9,8 @@
+ #include <sys/time.h>
+ #include <omp.h>
+ #include <limits.h>
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ #define PI acos(-1)
+ /**
+ @var M value for Linear Congruential Generator (LCG); use GCC's value
+@@ -341,7 +343,12 @@ int findIndexBin(double * CDF, int beginIndex, int endIndex, double value){
+ * @param Nparticles The number of particles to be used
+ */
+ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparticles){
+-	
++	 heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "particlefilter_heartbeat.log");
++        printf("heartbeat initialed \n");	
+ 	int max_size = IszX*IszY*Nfr;
+ 	long long start = get_time();
+ 	//original particle centroid
+@@ -504,7 +511,12 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
+ 		}
+ 		long long reset = get_time();
+ 		printf("TIME TO RESET WEIGHTS TOOK: %f\n", elapsed_time(xyj_time, reset));
++                heartbeat(&heart, 1, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        
+ 	}
++	heartbeat_finish(&heart);
+ 	free(disk);
+ 	free(objxy);
+ 	free(weights);
+@@ -518,7 +530,6 @@ void particleFilter(int * I, int IszX, int IszY, int Nfr, int * seed, int Nparti
+ 	free(ind);
+ }
+ int main(int argc, char * argv[]){
+-	
+ 	char* usage = "openmp.out -x <dimX> -y <dimY> -z <Nfr> -np <Nparticles>";
+ 	//check number of arguments
+ 	if(argc != 9)
+@@ -585,7 +596,7 @@ int main(int argc, char * argv[]){
+ 	//malloc matrix
+ 	int * I = (int *)malloc(sizeof(int)*IszX*IszY*Nfr);
+ 	long long start = get_time();
+-	//call video sequence
++        //call video sequence
+ 	videoSequence(I, IszX, IszY, Nfr, seed);
+ 	long long endVideoSequence = get_time();
+ 	printf("VIDEO SEQUENCE TOOK %f\n", elapsed_time(start, endVideoSequence));
+@@ -594,7 +605,6 @@ int main(int argc, char * argv[]){
+ 	long long endParticleFilter = get_time();
+ 	printf("PARTICLE FILTER TOOK %f\n", elapsed_time(endVideoSequence, endParticleFilter));
+ 	printf("ENTIRE PROGRAM TOOK %f\n", elapsed_time(start, endParticleFilter));
+-	
+ 	free(seed);
+ 	free(I);
+ 	return 0;
 diff --git a/openmp/particlefilter/particlefilter1socket.results b/openmp/particlefilter/particlefilter1socket.results
 new file mode 100755
 index 0000000..f7f6514
@@ -11846,9 +12734,66 @@ index 0000000..a573bc3
 +
 +
 +
+diff --git a/openmp/pathfinder/Makefile b/openmp/pathfinder/Makefile
+index 5f7f07a..87fdd43 100755
+--- a/openmp/pathfinder/Makefile
++++ b/openmp/pathfinder/Makefile
+@@ -2,12 +2,12 @@ CC = g++
+ SRC = pathfinder.cpp
+ EXE = pathfinder
+ FLAGS = -fopenmp
+-
++H_FLAGS = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared 
+ release:
+-	$(CC) $(SRC) $(FLAGS) -o $(EXE)
++	$(CC) $(SRC) $(FLAGS) -o $(EXE) $(H_FLAGS)
+ 
+ debug:
+-	$(CC) $(SRC) -g -Wall -o $(EXE)
++	$(CC) $(SRC) -g -Wall -o $(EXE) $(H_FLAGS)
+ 
+ clean:
+ 	rm -f pathfinder
 diff --git a/openmp/pathfinder/out b/openmp/pathfinder/out
 new file mode 100755
 index 0000000..e69de29
+diff --git a/openmp/pathfinder/pathfinder.cpp b/openmp/pathfinder/pathfinder.cpp
+index 18c190e..01b683f 100755
+--- a/openmp/pathfinder/pathfinder.cpp
++++ b/openmp/pathfinder/pathfinder.cpp
+@@ -4,7 +4,8 @@
+ #include <assert.h>
+ 
+ #include "timer.h"
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ void run(int argc, char** argv);
+ 
+ /* define timer macros */
+@@ -73,8 +74,20 @@ fatal(char *s)
+ 
+ int main(int argc, char** argv)
+ {
+-    run(argc,argv);
+-
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "pathfinder_heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 100; ii_tmp++){
++	run(argc,argv);
++        heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+     return EXIT_SUCCESS;
+ }
+ 
 diff --git a/openmp/pathfinder/pathfinder32threads.sh b/openmp/pathfinder/pathfinder32threads.sh
 new file mode 100755
 index 0000000..80c9ea8
@@ -11930,6 +12875,79 @@ index 0000000..80c9ea8
 +
 +
 +
+diff --git a/openmp/pathfinder/run b/openmp/pathfinder/run
+index b5093f5..7010126 100755
+--- a/openmp/pathfinder/run
++++ b/openmp/pathfinder/run
+@@ -1 +1 @@
+-./pathfinder 100000 100 > out
+\ No newline at end of file
++./pathfinder 100000 10000 > out
+diff --git a/openmp/srad/srad_v1/main.c b/openmp/srad/srad_v1/main.c
+index f087619..54a7bdc 100755
+--- a/openmp/srad/srad_v1/main.c
++++ b/openmp/srad/srad_v1/main.c
+@@ -30,7 +30,8 @@
+ #include "graphics.c"
+ #include "resize.c"
+ #include "timer.c"
+-
++#include "heartbeat-accuracy-power.h"
++heartbeat_t heart;
+ //====================================================================================================100
+ //====================================================================================================100
+ //	MAIN FUNCTION
+@@ -39,6 +40,14 @@
+ 
+ int main(int argc, char *argv []){
+ 
++	int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "srad_heartbeat.log");
++
++        for(ii_tmp = 0; ii_tmp < 30; ii_tmp++){
+ 	//================================================================================80
+ 	// 	VARIABLES
+ 	//================================================================================80
+@@ -382,6 +391,11 @@ int main(int argc, char *argv []){
+ //====================================================================================================100
+ //	END OF FILE
+ //====================================================================================================100
++        heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++        hb_get_current(&heart, &record);
++        }
++        heartbeat_finish(&heart);
+ 
+ }
+ 
+diff --git a/openmp/srad/srad_v1/makefile b/openmp/srad/srad_v1/makefile
+index 69226be..952687d 100755
+--- a/openmp/srad/srad_v1/makefile
++++ b/openmp/srad/srad_v1/makefile
+@@ -8,16 +8,17 @@
+ 	# command n
+ 
+ # link objects(binaries) together
++H_FLAGS=  -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared 
+ a.out:	main.o
+ 	gcc	main.o \
+-			-lm -fopenmp -o srad
++			-lm -fopenmp -o srad $(H_FLAGS)
+ 
+ # compile main function file into object (binary)
+ main.o: 	main.c \
+ 				define.c \
+ 				graphics.c
+ 	gcc	main.c \
+-			-c -O3 -fopenmp
++			-c -O3 -fopenmp	$(H_FLAGS)
+ 
+ # delete all object files
+ clean:
 diff --git a/openmp/srad/srad_v1/srad32threads.sh b/openmp/srad/srad_v1/srad32threads.sh
 new file mode 100755
 index 0000000..308c714
@@ -12011,6 +13029,36 @@ index 0000000..308c714
 +
 +
 +
+diff --git a/openmp/streamcluster/Makefile b/openmp/streamcluster/Makefile
+index e36aa78..a6c8012 100755
+--- a/openmp/streamcluster/Makefile
++++ b/openmp/streamcluster/Makefile
+@@ -4,6 +4,8 @@ TARGET_C = sc_cpu
+ 
+ TARGET_O = sc_omp
+ 
++Heartbeat = -L/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/lib -I/home/hankhoffmann/heartbeats-development/heartbeats-google-code/heartbeats/inc/ -lhb-acc-pow-shared
++
+ ifdef version
+   ifeq "$(version)" "parallel"
+     CXXFLAGS :=	$(CXXFLAGS) -DENABLE_THREADS -pthread
+@@ -16,7 +18,7 @@ cpu:
+ 	$(CXX) $(CXXFLAGS) $(LDFLAGS) streamcluster_original.cpp -o $(TARGET_C) $(LIBS) -DENABLE_THREADS -pthread
+ 
+ omp:
+-	g++ -O3 -fopenmp -o $(TARGET_O) streamcluster_omp.cpp
++	g++ -O3 -fopenmp -o $(TARGET_O) streamcluster_omp.cpp $(Heartbeat)
+ 
+ 
+ clean:
+diff --git a/openmp/streamcluster/run b/openmp/streamcluster/run
+index 0516f4d..5dbfbca 100755
+--- a/openmp/streamcluster/run
++++ b/openmp/streamcluster/run
+@@ -1 +1 @@
+-./sc_omp 10 20 256 65536 65536 1000 none output.txt 4
+\ No newline at end of file
++./sc_omp 10 20 256 65536 65536 1000 none output.txt 32
 diff --git a/openmp/streamcluster/streamcluster32threads.results b/openmp/streamcluster/streamcluster32threads.results
 new file mode 100755
 index 0000000..e9bf2f9
@@ -13413,3 +14461,49 @@ index 0000000..20b30e5
 +
 +
 +
+diff --git a/openmp/streamcluster/streamcluster_omp.cpp b/openmp/streamcluster/streamcluster_omp.cpp
+index 00b839d..1a15fc3 100755
+--- a/openmp/streamcluster/streamcluster_omp.cpp
++++ b/openmp/streamcluster/streamcluster_omp.cpp
+@@ -23,6 +23,8 @@
+ #include <sys/resource.h>
+ #include <limits.h>
+ #include <omp.h>
++#include <heartbeat-accuracy-power.h>
++heartbeat_t heart;
+ 
+ #ifdef ENABLE_PARSEC_HOOKS
+ #include <hooks.h>
+@@ -1202,6 +1204,17 @@ void streamCluster( PStream* stream,
+ 
+ int main(int argc, char **argv)
+ {
++        int ii = 100;
++        int ii_tmp = 0;
++        heartbeat_init(&heart,
++                   0.0, 100.0,
++                   0, 100,
++                   0, 1000,
++                   1, 1, "streamcluster_heartbeat.log");
++        for(ii_tmp = 0; ii_tmp < ii; ii_tmp++){
++
++
++
+   char *outfilename = new char[MAXNAMESIZE];
+   char *infilename = new char[MAXNAMESIZE];
+   long kmin, kmax, n, chunksize, clustersize;
+@@ -1288,6 +1301,13 @@ int main(int argc, char **argv)
+ #ifdef ENABLE_PARSEC_HOOKS
+   __parsec_bench_end();
+ #endif
+-  
++       heartbeat(&heart, ii_tmp, 1);
++        heartbeat_record_t record;
++
++        hb_get_current(&heart, &record);
++  }
++        heartbeat_finish(&heart);  
++
++
+   return 0;
+ }
